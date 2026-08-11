@@ -1,0 +1,581 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="page-wrap">
+    <div class="add-student-card">
+        <div class="top-section">
+            <div class="top-icon">🎓</div>
+            <div>
+                <h1>Add Student</h1>
+                <p class="subtitle">Enter student details and preview the camera before capturing face data</p>
+            </div>
+        </div>
+
+        <form id="studentForm" class="student-form">
+            <div class="main-grid">
+                
+                <!-- Left Form Section -->
+                <div class="form-panel">
+                    <div class="panel-title">Student Information</div>
+
+                    <div class="form-group">
+                        <label>Student Name</label>
+                        <input type="text" id="name" placeholder="Enter full name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Roll Number</label>
+                        <input type="text" id="roll" placeholder="Enter roll number" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Department</label>
+                        <input type="text" id="department" placeholder="Enter department name" required>
+                    </div>
+
+                    <div class="button-row">
+                        <button type="button" class="btn btn-primary" id="saveAndStartBtn">
+                            Save & Start Camera
+                        </button>
+                        <button type="button" class="btn btn-success" id="finishBtn" disabled>
+                            Finish & Train Model
+                        </button>
+                        <button type="button" class="btn btn-secondary" id="resetBtn">
+                            Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Camera Section -->
+                <div class="preview-panel">
+                    <div class="panel-title">📷 Camera Preview</div>
+
+                    <div class="camera-stage">
+                        <img id="cameraFeed" src="" alt="Camera Preview" style="display:none;">
+
+                        <div id="cameraPlaceholder" class="camera-placeholder">
+                            <div class="placeholder-inner">
+                                <div class="camera-icon">📸</div>
+                                <div class="placeholder-title">Camera preview will appear here</div>
+                                <div class="placeholder-subtext">Click “Save & Start Camera” to begin face capture</div>
+                            </div>
+                        </div>
+
+                        <div id="trainingOverlay" class="training-overlay" style="display:none;">
+                            <div class="overlay-box">
+                                <div id="trainingMessage">Model training is in progress...</div>
+                                <div id="trainingPercent">0%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="status-row">
+                        <div id="captureStatusText" class="status-badge">Ready</div>
+                        <div id="sampleCount" class="sample-badge">0 / 60</div>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    * {
+        box-sizing: border-box;
+    }
+
+    .page-wrap {
+        min-height: 100vh;
+        padding: 30px;
+        background: linear-gradient(135deg, #eaf4ff 0%, #dbeafe 45%, #c7e0ff 100%);
+    }
+
+    .add-student-card {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(120, 170, 255, 0.25);
+        border-radius: 26px;
+        padding: 34px;
+        box-shadow: 0 20px 50px rgba(24, 71, 145, 0.15);
+    }
+
+    .top-section {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+        margin-bottom: 28px;
+    }
+
+    .top-icon {
+        width: 72px;
+        height: 72px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #0f4cbd, #3b82f6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        color: #fff;
+        box-shadow: 0 12px 24px rgba(59, 130, 246, 0.28);
+        flex-shrink: 0;
+    }
+
+    .add-student-card h1 {
+        margin: 0;
+        font-size: 38px;
+        font-weight: 800;
+        color: #0f172a;
+        letter-spacing: 0.3px;
+    }
+
+    .subtitle {
+        margin: 8px 0 0;
+        color: #475569;
+        font-size: 15px;
+    }
+
+    .main-grid {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 26px;
+        align-items: start;
+    }
+
+    .form-panel,
+    .preview-panel {
+        background: linear-gradient(180deg, #f8fbff 0%, #eef6ff 100%);
+        border: 1px solid #cfe3ff;
+        border-radius: 22px;
+        padding: 24px;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+    }
+
+    .panel-title {
+        font-size: 18px;
+        font-weight: 800;
+        color: #0f4cbd;
+        margin-bottom: 18px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #d6e8ff;
+    }
+
+    .form-group {
+        margin-bottom: 18px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 9px;
+        color: #1e3a8a;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 15px 18px;
+        border-radius: 14px;
+        border: 1px solid #bfdbfe;
+        background: #f8fbff;
+        color: #0f172a;
+        font-size: 15px;
+        outline: none;
+        transition: all 0.25s ease;
+        box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.03);
+    }
+
+    .form-group input:focus {
+        border-color: #3b82f6;
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+    }
+
+    .camera-stage {
+        position: relative;
+        width: 100%;
+        min-height: 320px;
+        background: linear-gradient(135deg, #dbeafe, #eff6ff);
+        border: 2px dashed #93c5fd;
+        border-radius: 18px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #cameraFeed {
+        width: 100%;
+        height: 320px;
+        object-fit: cover;
+        border-radius: 18px;
+    }
+
+    .camera-placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 30px;
+        width: 100%;
+        height: 320px;
+    }
+
+    .placeholder-inner {
+        max-width: 320px;
+    }
+
+    .camera-icon {
+        font-size: 46px;
+        margin-bottom: 12px;
+    }
+
+    .placeholder-title {
+        font-size: 21px;
+        font-weight: 800;
+        color: #1e3a8a;
+        margin-bottom: 8px;
+    }
+
+    .placeholder-subtext {
+        color: #64748b;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+
+    .training-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(8, 47, 107, 0.78);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+    }
+
+    .overlay-box {
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.28);
+        padding: 28px 32px;
+        border-radius: 18px;
+        text-align: center;
+        color: #ffffff;
+        min-width: 250px;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+    }
+
+    #trainingMessage {
+        font-size: 22px;
+        font-weight: 800;
+        margin-bottom: 10px;
+    }
+
+    #trainingPercent {
+        font-size: 18px;
+        font-weight: 700;
+        color: #bfdbfe;
+    }
+
+    .status-row {
+        margin-top: 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .status-badge,
+    .sample-badge {
+        padding: 10px 16px;
+        border-radius: 999px;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .status-badge {
+        background: #dbeafe;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+    }
+
+    .sample-badge {
+        background: #eff6ff;
+        color: #334155;
+        border: 1px solid #dbeafe;
+    }
+
+    .button-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+        margin-top: 22px;
+    }
+
+    .btn {
+        border: none;
+        padding: 13px 22px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 700;
+        transition: all 0.25s ease;
+        box-shadow: 0 8px 20px rgba(15, 76, 189, 0.10);
+    }
+
+    .btn:hover {
+        transform: translateY(-1px);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #0f4cbd, #2563eb);
+        color: #ffffff;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #0b3f9f, #1d4ed8);
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, #0284c7, #0ea5e9);
+        color: white;
+    }
+
+    .btn-success:hover {
+        background: linear-gradient(135deg, #0369a1, #0284c7);
+    }
+
+    .btn-secondary {
+        background: #ffffff;
+        color: #1e3a8a;
+        border: 1px solid #bfdbfe;
+    }
+
+    .btn-secondary:hover {
+        background: #eff6ff;
+    }
+
+    .btn:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    @media (max-width: 950px) {
+        .main-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .top-section {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .add-student-card {
+            padding: 24px;
+        }
+
+        .add-student-card h1 {
+            font-size: 32px;
+        }
+
+        .camera-stage,
+        #cameraFeed,
+        .camera-placeholder {
+            height: 260px;
+            min-height: 260px;
+        }
+
+        .button-row {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<script>
+let studentId = null;
+let capturePolling = null;
+let trainingPolling = null;
+
+const saveAndStartBtn = document.getElementById("saveAndStartBtn");
+const finishBtn = document.getElementById("finishBtn");
+const resetBtn = document.getElementById("resetBtn");
+const cameraFeed = document.getElementById("cameraFeed");
+const cameraPlaceholder = document.getElementById("cameraPlaceholder");
+const captureStatusText = document.getElementById("captureStatusText");
+const sampleCount = document.getElementById("sampleCount");
+const trainingOverlay = document.getElementById("trainingOverlay");
+const trainingMessage = document.getElementById("trainingMessage");
+const trainingPercent = document.getElementById("trainingPercent");
+
+async function saveStudentAndStart() {
+    const name = document.getElementById("name").value.trim();
+    const roll = document.getElementById("roll").value.trim();
+    const department = document.getElementById("department").value.trim();
+
+    if (!name || !roll || !department) {
+        alert("Please fill all fields.");
+        return;
+    }
+
+    saveAndStartBtn.disabled = true;
+    captureStatusText.innerText = "Saving student...";
+
+    try {
+        const res = await fetch("{{ url_for('add_student_ajax') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ name, roll, department })
+        });
+
+        const data = await res.json();
+
+        if (!data.success) {
+            alert(data.message || "Could not save student.");
+            saveAndStartBtn.disabled = false;
+            captureStatusText.innerText = "Ready";
+            return;
+        }
+
+        studentId = data.student_id;
+        await startCapture(studentId);
+
+    } catch (err) {
+        alert("Something went wrong while saving student.");
+        saveAndStartBtn.disabled = false;
+        captureStatusText.innerText = "Ready";
+    }
+}
+
+async function startCapture(id) {
+    const res = await fetch(`/start_capture/${id}`);
+    const data = await res.json();
+
+    if (data.status !== "success") {
+        alert(data.message || "Could not start capture.");
+        saveAndStartBtn.disabled = false;
+        return;
+    }
+
+    cameraFeed.src = `/capture_video_feed?student_id=${id}&t=${Date.now()}`;
+    cameraFeed.style.display = "block";
+    cameraPlaceholder.style.display = "none";
+    finishBtn.disabled = false;
+    captureStatusText.innerText = "Capture started";
+    sampleCount.innerText = `0 / ${data.max_samples}`;
+
+    startCapturePolling();
+}
+
+function startCapturePolling() {
+    if (capturePolling) clearInterval(capturePolling);
+
+    capturePolling = setInterval(async () => {
+        try {
+            const res = await fetch("/capture_status");
+            const data = await res.json();
+
+            captureStatusText.innerText = data.message;
+            sampleCount.innerText = `${data.count} / ${data.max_samples}`;
+
+            if (data.done || data.count >= data.max_samples) {
+                clearInterval(capturePolling);
+                finishAndTrain();
+            }
+        } catch (err) {
+            console.log("Capture polling error", err);
+        }
+    }, 1000);
+}
+
+async function finishAndTrain() {
+    finishBtn.disabled = true;
+    captureStatusText.innerText = "Starting training...";
+
+    try {
+        const res = await fetch("/stop_capture_and_train");
+        const data = await res.json();
+
+        if (!data.success) {
+            alert(data.message || "Training could not start.");
+            return;
+        }
+
+        trainingOverlay.style.display = "flex";
+        trainingMessage.innerText = "Model training is in progress...";
+        trainingPercent.innerText = "0%";
+        startTrainingPolling();
+
+    } catch (err) {
+        alert("Something went wrong while starting training.");
+    }
+}
+
+function startTrainingPolling() {
+    if (trainingPolling) clearInterval(trainingPolling);
+
+    trainingPolling = setInterval(async () => {
+        try {
+            const res = await fetch("/training_status");
+            const data = await res.json();
+
+            if (data.training) {
+                trainingOverlay.style.display = "flex";
+                trainingMessage.innerText = data.message;
+                trainingPercent.innerText = `${data.progress}%`;
+                captureStatusText.innerText = data.message;
+            } else {
+                trainingMessage.innerText = data.message;
+                trainingPercent.innerText = `${data.progress}%`;
+
+                if (data.progress === 100) {
+                    captureStatusText.innerText = "Completed";
+                    clearInterval(trainingPolling);
+
+                    setTimeout(() => {
+                        window.location.href = "{{ url_for('students') }}";
+                    }, 1800);
+                } else {
+                    trainingOverlay.style.display = "none";
+                }
+            }
+        } catch (err) {
+            console.log("Training polling error", err);
+        }
+    }, 1000);
+}
+
+function resetPage() {
+    studentId = null;
+    if (capturePolling) clearInterval(capturePolling);
+    if (trainingPolling) clearInterval(trainingPolling);
+
+    cameraFeed.src = "";
+    cameraFeed.style.display = "none";
+    cameraPlaceholder.style.display = "flex";
+    trainingOverlay.style.display = "none";
+    captureStatusText.innerText = "Ready";
+    sampleCount.innerText = "0 / 60";
+    saveAndStartBtn.disabled = false;
+    finishBtn.disabled = true;
+
+    document.getElementById("name").value = "";
+    document.getElementById("roll").value = "";
+    document.getElementById("department").value = "";
+}
+
+saveAndStartBtn.addEventListener("click", saveStudentAndStart);
+finishBtn.addEventListener("click", finishAndTrain);
+resetBtn.addEventListener("click", resetPage);
+</script>
+
+{% endblock %}

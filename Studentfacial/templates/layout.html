@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Attendance</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    {% if session.get('admin_logged_in') %}
+    <div class="navbar">
+        <div class="nav-left">
+            <span class="brand">Smart Attendance</span>
+        </div>
+        <div class="nav-right">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('students') }}">Students</a>
+            <a href="{{ url_for('add_student') }}">Add Student</a>
+            <a href="{{ url_for('mark_attendance') }}">Live Attendance</a>
+            <a href="{{ url_for('attendance') }}">Records</a>
+            <a href="{{ url_for('export_attendance') }}">Export CSV</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <p class="msg {{ category }}">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

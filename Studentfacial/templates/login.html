@@ -1,0 +1,268 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    html, body {
+        height: 100%;
+        overflow: hidden;
+    }
+
+    body {
+        background: linear-gradient(135deg, #eff1f8, #e7e9f3);
+    }
+
+    .login-page {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        padding: 10px;
+        background: linear-gradient(135deg, #eef0f7 0%, #e9ebf4 100%);
+    }
+
+    .login-page::before,
+    .login-page::after {
+        content: "";
+        position: absolute;
+        border-radius: 50%;
+        z-index: 0;
+        filter: blur(55px);
+    }
+
+    .login-page::before {
+        width: 300px;
+        height: 300px;
+        left: 70px;
+        top: 90px;
+        background: rgba(173, 181, 255, 0.35);
+    }
+
+    .login-page::after {
+        width: 340px;
+        height: 340px;
+        right: 90px;
+        bottom: 70px;
+        background: rgba(210, 175, 255, 0.28);
+    }
+
+    .bg-circle-1,
+    .bg-circle-2 {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(65px);
+        z-index: 0;
+    }
+
+    .bg-circle-1 {
+        width: 220px;
+        height: 220px;
+        left: 120px;
+        bottom: 100px;
+        background: rgba(200, 210, 255, 0.18);
+    }
+
+    .bg-circle-2 {
+        width: 180px;
+        height: 180px;
+        right: 260px;
+        top: 120px;
+        background: rgba(255, 255, 255, 0.35);
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 540px;
+        background: rgba(248, 248, 251, 0.88);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border-radius: 20px;
+        padding: 16px 20px 14px;
+        box-shadow: 0 10px 30px rgba(78, 88, 140, 0.10);
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        border: 1px solid rgba(255, 255, 255, 0.55);
+    }
+
+    .login-icon {
+        width: 60px;
+        height: 60px;
+        margin: 0 auto 10px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #6d7df0, #7a45c5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        box-shadow: 0 8px 20px rgba(103, 89, 210, 0.22);
+    }
+
+    .login-card h2 {
+        font-size: 21px;
+        color: #2e3358;
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .login-subtitle {
+        font-size: 12px;
+        color: #8a90ac;
+        margin-bottom: 14px;
+    }
+
+    .form-box {
+        width: 100%;
+    }
+
+    .input-group {
+        position: relative;
+        margin-bottom: 12px;
+    }
+
+    .form-box input {
+        width: 100%;
+        height: 46px;
+        border: none;
+        outline: none;
+        border-radius: 14px;
+        background: #e9eef7;
+        padding: 0 16px;
+        font-size: 14px;
+        color: #222;
+    }
+
+    .form-box input::placeholder {
+        color: #9aa3b5;
+    }
+
+    .password-input {
+        padding-right: 46px !important;
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-size: 15px;
+        color: #6f7595;
+    }
+
+    .form-box button[type="submit"] {
+        width: 100%;
+        height: 48px;
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(90deg, #6d83f3, #7d45be);
+        color: white;
+        font-size: 17px;
+        font-weight: 700;
+        cursor: pointer;
+        margin-top: 2px;
+        box-shadow: 0 10px 20px rgba(104, 96, 210, 0.16);
+        transition: 0.3s ease;
+    }
+
+    .form-box button[type="submit"]:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 24px rgba(104, 96, 210, 0.20);
+    }
+
+    .note {
+        margin-top: 10px;
+        font-size: 12px;
+        color: #8b91ab;
+    }
+
+    .note strong {
+        color: #6d7595;
+    }
+
+    @media (max-width: 768px) {
+        html, body {
+            overflow: auto;
+        }
+
+        .login-page {
+            height: auto;
+            min-height: 100vh;
+            padding: 12px;
+        }
+
+        .login-card {
+            max-width: 100%;
+            padding: 16px 12px 14px;
+            border-radius: 16px;
+        }
+
+        .login-card h2 {
+            font-size: 20px;
+        }
+
+        .form-box input,
+        .form-box button[type="submit"] {
+            height: 44px;
+            font-size: 13px;
+        }
+
+        .login-icon {
+            width: 56px;
+            height: 56px;
+            font-size: 20px;
+        }
+
+        .login-page::before,
+        .login-page::after,
+        .bg-circle-1,
+        .bg-circle-2 {
+            display: none;
+        }
+    }
+</style>
+
+<div class="login-page">
+    <div class="bg-circle-1"></div>
+    <div class="bg-circle-2"></div>
+
+    <div class="login-card">
+        <div class="login-icon">🔐</div>
+        <h2>Admin Login</h2>
+        <p class="login-subtitle">Sign in to continue to your dashboard</p>
+
+        <form method="POST" class="form-box">
+            <div class="input-group">
+                <input type="text" name="username" placeholder="Username" required>
+            </div>
+
+            <div class="input-group">
+                <input type="password" name="password" id="password" class="password-input" placeholder="Password" required>
+                <button type="button" class="toggle-password" onclick="togglePassword()">👁</button>
+            </div>
+
+            <button type="submit">Login</button>
+        </form>
+
+        <p class="note">Default login: <strong>admin / admin123</strong></p>
+    </div>
+</div>
+
+<script>
+    function togglePassword() {
+        const password = document.getElementById("password");
+        password.type = password.type === "password" ? "text" : "password";
+    }
+</script>
+
+{% endblock %}

@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: studentfacial-app
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"
+
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: 3.10.12
+    disk:
+      name: studentfacial-data
+      mountPath: /app/dataset
+      sizeGB: 1

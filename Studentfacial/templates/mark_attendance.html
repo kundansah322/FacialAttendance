@@ -1,0 +1,86 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="attendance-title">
+    <h2>Live Attendance</h2>
+    <p>Start the camera to detect and record student attendance in real time</p>
+</div>
+
+<div class="attendance-wrapper">
+    <div class="camera-panel">
+        <div class="camera-header">
+            <h3>Camera Preview</h3>
+            <span class="live-badge">● LIVE</span>
+        </div>
+        <img id="videoStream" src="{{ url_for('video_feed') }}" alt="Live Camera Feed">
+    </div>
+
+    <div class="side-panel">
+        <div class="action-box">
+            <h3>Attendance Controls</h3>
+            <div class="action-buttons">
+                <button onclick="startCamera()">Start Attendance</button>
+                <button class="stop-btn" onclick="stopCamera()">Stop Attendance</button>
+            </div>
+            <p class="note">Use the buttons above to control live attendance marking.</p>
+        </div>
+
+        <div class="info-box">
+            <h3>Recent Attendance</h3>
+            <div id="attendanceList">No attendance yet.</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function startCamera() {
+        const res = await fetch("/start_attendance_camera");
+        const data = await res.json();
+        alert(data.message);
+
+        const img = document.getElementById("videoStream");
+        img.src = "/video_feed?t=" + new Date().getTime();
+
+        loadAttendance();
+    }
+
+    async function stopCamera() {
+        const res = await fetch("/stop_attendance_camera");
+        const data = await res.json();
+        alert(data.message);
+    }
+
+    async function loadAttendance() {
+        try {
+            const res = await fetch("/attendance_status");
+            const data = await res.json();
+
+            const box = document.getElementById("attendanceList");
+
+            if (!data.length) {
+                box.innerHTML = "No attendance yet.";
+                return;
+            }
+
+            let html = "";
+            data.forEach(item => {
+                html += `
+                    <div class="attendance-card present-card">
+                        <strong>${item.name}</strong><br>
+                        Roll: ${item.roll}<br>
+                        Dept: ${item.department}<br>
+                        Time: ${item.time}
+                    </div>
+                `;
+            });
+
+            box.innerHTML = html;
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    setInterval(loadAttendance, 3000);
+</script>
+
+{% endblock %}

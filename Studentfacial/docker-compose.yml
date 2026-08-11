@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  studentfacial:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - SECRET_KEY=studentfacial_production_secret_key_2026
+      - FLASK_ENV=production
+    volumes:
+      - ./dataset:/app/dataset
+      - ./trainer:/app/trainer
+      - ./exports:/app/exports
+      - ./students.db:/app/students.db
+    restart: unless-stopped

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Facial Attendance System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Student Management System with Facial Attendance</h1>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <p class="msg {{ category }}">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="menu">
+            <a href="{{ url_for('add_student') }}">Add Student</a>
+            <a href="{{ url_for('students') }}">View Students</a>
+            <a href="{{ url_for('mark_attendance') }}">Mark Attendance</a>
+            <a href="{{ url_for('view_attendance') }}">View Attendance</a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Edit Student</h2>
+
+<form method="POST" class="form-box">
+    <input type="text" name="name" value="{{ student.name }}" required>
+    <input type="text" name="roll" value="{{ student.roll }}" required>
+    <input type="text" name="department" value="{{ student.department }}" required>
+    <button type="submit">Update Student</button>
+</form>
+{% endblock %}

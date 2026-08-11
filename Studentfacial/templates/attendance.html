@@ -1,0 +1,33 @@
+{% extends "layout.html" %}
+{% block content %}
+<h2>Attendance Records</h2>
+
+<form method="GET" action="{{ url_for('attendance') }}" class="filter-box">
+    <input type="text" name="q" value="{{ query }}" placeholder="Search by name, roll, department">
+    <input type="date" name="date" value="{{ date_filter }}">
+    <button type="submit">Filter</button>
+</form>
+
+<table>
+    <tr>
+        
+        <th>Name</th>
+        <th>Roll</th>
+        <th>Department</th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Status</th>
+    </tr>
+    {% for r in records %}
+    <tr>
+    
+        <td>{{ r.name }}</td>
+        <td>{{ r.roll }}</td>
+        <td>{{ r.department }}</td>
+        <td>{{ r.date }}</td>
+        <td>{{ r.time }}</td>
+        <td><span class="badge present">Present</span></td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}
